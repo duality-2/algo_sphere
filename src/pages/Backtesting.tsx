@@ -1,14 +1,38 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { BacktestResults } from "@/components/BacktestResults";
+import Papa from "papaparse";
+
+interface Stock {
+  TICKER: string;
+  NAME: string;
+}
 
 export default function Backtesting() {
   const [model, setModel] = useState<string>("");
   const [symbol, setSymbol] = useState<string>("");
+  const [stocks, setStocks] = useState<Stock[]>([]);
   const [ran, setRan] = useState(false);
+
+  useEffect(() => {
+    const fetchStocks = async () => {
+      const response = await fetch("/data.csv");
+      const reader = response.body?.getReader();
+      const result = await reader?.read();
+      const decoder = new TextDecoder("utf-8");
+      const csv = decoder.decode(result?.value);
+      Papa.parse(csv, {
+        header: true,
+        complete: (results) => {
+          setStocks(results.data as Stock[]);
+        },
+      });
+    };
+    fetchStocks();
+  }, []);
 
   return (
     <div className="space-y-6">

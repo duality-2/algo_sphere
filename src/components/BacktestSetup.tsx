@@ -66,7 +66,7 @@ export function BacktestSetup() {
           <label htmlFor="stock" className="text-sm font-medium text-muted-foreground">Stock Symbol</label>
           <Select onValueChange={setSelectedStock} value={selectedStock}>
             <SelectTrigger id="stock" className="w-full">
-              <SelectValue placeholder="e.g. AAPL" />
+              <SelectValue placeholder="e.g. ADANIPORTS" />
             </SelectTrigger>
             <SelectContent>
               {stocks.map((stock) => (
