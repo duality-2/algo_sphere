@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Trading App</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+    <h1>Trading Strategy Backtesting</h1>
+
+    <div>
+        <label for="stock">Select Stock:</label>
+        <select id="stock"></select>
+    </div>
+
+    <div>
+        <label for="strategy">Select Strategy:</label>
+        <select id="strategy">
+            <option value="moving_average_crossover">Moving Average Crossover</option>
+            <option value="rsi">RSI</option>
+        </select>
+    </div>
+
+    <div id="strategy-params"></div>
+
+    <div>
+        <button id="run-backtest">Run Backtest</button>
+    </div>
+
+    <div id="chart-container">
+        <canvas id="chart"></canvas>
+        <canvas id="volatility-chart"></canvas>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
