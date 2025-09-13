@@ -6,6 +6,7 @@ import { BacktestResults } from "@/components/BacktestResults";
 import { StrategyLibrary } from "@/components/StrategyLibrary";
 import { AIDemo } from "@/components/AIDemo";
 import Backtesting from "@/pages/Backtesting";
+import Auth from "@/pages/Auth";
 
 const Index = () => {
   const [activeView, setActiveView] = useState("dashboard");
@@ -26,6 +27,8 @@ const Index = () => {
         return <StrategyLibrary />;
       case "execute":
         return <Dashboard />;
+      case "auth":
+        return <Auth onNavigate={setActiveView} />;
       default:
         return <Dashboard />;
     }

@@ -1,6 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Activity, BarChart3, BookOpen, Settings, User, LogOut, Brain } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 interface NavigationProps {
   activeView: string;
@@ -8,6 +10,14 @@ interface NavigationProps {
 }
 
 export function Navigation({ activeView, onViewChange }: NavigationProps) {
+  const navigate = useNavigate();
+  
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    toast.success("Logged out successfully");
+    navigate("/login");
+  };
+
   const navItems = [
     { id: "dashboard", label: "Dashboard", icon: Activity },
     { id: "builder", label: "Strategy Builder", icon: BarChart3 },
@@ -52,7 +62,7 @@ export function Navigation({ activeView, onViewChange }: NavigationProps) {
         <Button variant="ghost" size="icon" onClick={() => onViewChange("auth")}>
           <User className="h-5 w-5" />
         </Button>
-        <Button variant="ghost" size="icon">
+        <Button variant="ghost" size="icon" onClick={handleLogout}>
           <LogOut className="h-5 w-5" />
         </Button>
       </div>
