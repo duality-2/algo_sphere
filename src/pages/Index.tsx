@@ -4,8 +4,8 @@ import { Dashboard } from "@/components/Dashboard";
 import { StrategyBuilder } from "@/components/StrategyBuilder";
 import { BacktestResults } from "@/components/BacktestResults";
 import { StrategyLibrary } from "@/components/StrategyLibrary";
+import { AIDemo } from "@/components/AIDemo";
 import Backtesting from "@/pages/Backtesting";
-import Auth from "@/pages/Auth";
 
 const Index = () => {
   const [activeView, setActiveView] = useState("dashboard");
@@ -18,12 +18,12 @@ const Index = () => {
         return <StrategyBuilder onNavigate={setActiveView} />;
       case "backtesting":
         return <Backtesting />;
+      case "ai-demo":
+        return <AIDemo />;
       case "backtest":
         return <BacktestResults />;
       case "library":
         return <StrategyLibrary />;
-      case "auth":
-        return <Auth onNavigate={setActiveView} />;
       case "execute":
         return <Dashboard />;
       default:

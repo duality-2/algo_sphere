@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Activity, BarChart3, BookOpen, Settings, User, LogOut } from "lucide-react";
+import { Activity, BarChart3, BookOpen, Settings, User, LogOut, Brain } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface NavigationProps {
@@ -12,7 +12,7 @@ export function Navigation({ activeView, onViewChange }: NavigationProps) {
     { id: "dashboard", label: "Dashboard", icon: Activity },
     { id: "builder", label: "Strategy Builder", icon: BarChart3 },
     { id: "backtesting", label: "Backtesting", icon: BookOpen },
-    { id: "backtest", label: "Backtest Results", icon: BookOpen },
+    { id: "ai-demo", label: "AI Demo", icon: Brain },
     { id: "library", label: "Strategy Library", icon: Settings },
   ];
 
