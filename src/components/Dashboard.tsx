@@ -22,6 +22,7 @@ import {
   Clock,
   Zap,
 } from "lucide-react";
+import { BacktestSetup } from "./BacktestSetup";
 
 const portfolioData = [
   { time: "09:30", value: 100000 },
@@ -105,6 +106,12 @@ export function Dashboard() {
             </div>
           </CardContent>
         </Card>
+      </div>
+
+      {/* Backtesting Setup */}
+      <div>
+        <h2 className="text-lg font-semibold mb-4">Backtesting Setup</h2>
+        <BacktestSetup />
       </div>
 
       {/* Market Overview */}
