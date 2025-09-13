@@ -14,8 +14,20 @@ import {
   Tooltip,
   ResponsiveContainer,
   Legend,
+  ComposedChart,
+  ReferenceLine,
 } from "recharts";
 import { TrendingUp, TrendingDown, DollarSign, Percent, Calendar, Target } from "lucide-react";
+
+// Stock price data with OHLC format for candlestick-like visualization
+const stockPriceData = [
+  { date: "Jan", open: 520, high: 550, low: 515, close: 545, volume: 2.1, signal: "buy" },
+  { date: "Feb", open: 545, high: 580, low: 540, close: 575, volume: 2.3, signal: null },
+  { date: "Mar", open: 575, high: 590, low: 560, close: 585, volume: 1.9, signal: null },
+  { date: "Apr", open: 585, high: 620, low: 580, close: 610, volume: 2.5, signal: "sell" },
+  { date: "May", open: 610, high: 630, low: 595, close: 625, volume: 2.2, signal: null },
+  { date: "Jun", open: 625, high: 650, low: 620, close: 645, volume: 2.4, signal: "buy" },
+];
 
 const performanceData = [
   { month: "Jan", portfolio: 100000, benchmark: 100000 },
@@ -65,12 +77,92 @@ export function BacktestResults() {
       </div>
 
       {/* Charts */}
-      <Tabs defaultValue="performance" className="space-y-4">
+      <Tabs defaultValue="stock-chart" className="space-y-4">
         <TabsList className="bg-secondary/50">
-          <TabsTrigger value="performance">Performance</TabsTrigger>
+          <TabsTrigger value="stock-chart">Stock Chart</TabsTrigger>
+          <TabsTrigger value="performance">Portfolio Performance</TabsTrigger>
           <TabsTrigger value="distribution">Trade Distribution</TabsTrigger>
           <TabsTrigger value="drawdown">Drawdown</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="stock-chart">
+          <Card className="bg-gradient-card border-border/50">
+            <CardHeader>
+              <CardTitle>Stock Price Chart with Trading Signals</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={400}>
+                <ComposedChart data={stockPriceData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                  <XAxis dataKey="date" stroke="hsl(var(--muted-foreground))" />
+                  <YAxis stroke="hsl(var(--muted-foreground))" domain={['dataMin - 20', 'dataMax + 20']} />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "hsl(var(--card))",
+                      border: "1px solid hsl(var(--border))",
+                      borderRadius: "6px",
+                    }}
+                    formatter={(value, name) => [
+                      `₹${value}`,
+                      name === 'high' ? 'High' : name === 'low' ? 'Low' : name === 'open' ? 'Open' : 'Close'
+                    ]}
+                  />
+                  <Legend />
+                  
+                  {/* High-Low lines */}
+                  <Line
+                    type="monotone"
+                    dataKey="high"
+                    stroke="hsl(var(--chart-2))"
+                    strokeWidth={1}
+                    dot={false}
+                    name="High"
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="low"
+                    stroke="hsl(var(--chart-2))"
+                    strokeWidth={1}
+                    dot={false}
+                    name="Low"
+                  />
+                  
+                  {/* Main price line (close) */}
+                  <Line
+                    type="monotone"
+                    dataKey="close"
+                    stroke="hsl(var(--profit))"
+                    strokeWidth={3}
+                    dot={{ fill: "hsl(var(--profit))", strokeWidth: 2, r: 4 }}
+                    name="Close Price"
+                  />
+                  
+                  {/* Open price line */}
+                  <Line
+                    type="monotone"
+                    dataKey="open"
+                    stroke="hsl(var(--chart-1))"
+                    strokeWidth={2}
+                    strokeDasharray="5 5"
+                    dot={false}
+                    name="Open Price"
+                  />
+
+                  {/* Buy/Sell signals */}
+                  {stockPriceData.map((item, index) => {
+                    if (item.signal === "buy") {
+                      return <ReferenceLine key={`buy-${index}`} x={item.date} stroke="hsl(var(--profit))" strokeWidth={2} />;
+                    }
+                    if (item.signal === "sell") {
+                      return <ReferenceLine key={`sell-${index}`} x={item.date} stroke="hsl(var(--loss))" strokeWidth={2} />;
+                    }
+                    return null;
+                  })}
+                </ComposedChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
         <TabsContent value="performance">
           <Card className="bg-gradient-card border-border/50">

@@ -1,4 +1,4 @@
-ti import { MarketOverview } from "./MarketOverview";
+import { MarketOverview } from "./MarketOverview";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -51,7 +51,7 @@ export function Dashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground mb-1">Portfolio Value</p>
-                <p className="text-2xl font-bold">$102,800</p>
+                <p className="text-2xl font-bold">₹102,800</p>
                 <div className="flex items-center gap-1 mt-1">
                   <ArrowUpRight className="h-4 w-4 text-profit" />
                   <span className="text-sm text-profit">+2.8%</span>
@@ -67,7 +67,7 @@ export function Dashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground mb-1">Today's P&L</p>
-                <p className="text-2xl font-bold text-profit">+$2,800</p>
+                <p className="text-2xl font-bold text-profit">+₹2,800</p>
                 <div className="flex items-center gap-1 mt-1">
                   <TrendingUp className="h-4 w-4 text-profit" />
                   <span className="text-sm text-muted-foreground">8 winning trades</span>
@@ -176,7 +176,7 @@ export function Dashboard() {
                         <ArrowDownRight className="h-3 w-3" />
                       )}
                       <span className="font-medium">
-                        ${Math.abs(strategy.pnl).toLocaleString()} ({strategy.pnlPercent}%)
+                        ₹{Math.abs(strategy.pnl).toLocaleString()} ({strategy.pnlPercent}%)
                       </span>
                     </div>
                   </div>

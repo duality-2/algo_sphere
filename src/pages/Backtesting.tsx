@@ -32,7 +32,7 @@ export default function Backtesting() {
           </div>
           <div>
             <label className="text-sm mb-1 block text-muted-foreground">Stock Symbol</label>
-            <Input placeholder="e.g. AAPL" value={symbol} onChange={(e) => setSymbol(e.target.value.toUpperCase())} />
+            <Input placeholder="e.g. ADANIPORT" value={symbol} onChange={(e) => setSymbol(e.target.value.toUpperCase())} />
           </div>
           <div className="flex items-end">
             <Button className="w-full" onClick={() => setRan(true)} disabled={!model || !symbol}>

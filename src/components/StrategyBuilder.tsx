@@ -2,6 +2,8 @@ import { useState } from "react";
 import { StrategyBlock } from "./StrategyBlock";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
 import {
@@ -50,6 +52,8 @@ interface DroppedBlock {
   type: string;
   name: string;
   instanceId: string;
+  value?: string;
+  threshold?: string;
 }
 
 interface StrategyBuilderProps {
@@ -59,6 +63,17 @@ interface StrategyBuilderProps {
 export function StrategyBuilder({ onNavigate }: StrategyBuilderProps) {
   const [droppedBlocks, setDroppedBlocks] = useState<DroppedBlock[]>([]);
   const [draggedOver, setDraggedOver] = useState(false);
+  const [editingBlock, setEditingBlock] = useState<string | null>(null);
+
+  const updateBlockValue = (instanceId: string, field: 'value' | 'threshold', newValue: string) => {
+    setDroppedBlocks(blocks => 
+      blocks.map(block => 
+        block.instanceId === instanceId 
+          ? { ...block, [field]: newValue }
+          : block
+      )
+    );
+  };
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
@@ -242,6 +257,56 @@ export function StrategyBuilder({ onNavigate }: StrategyBuilderProps) {
                       <div className="flex-1">
                         <h4 className="text-sm font-medium">{block.name}</h4>
                         <p className="text-xs text-muted-foreground capitalize">{block.type}</p>
+                        
+                        {/* Editable fields for conditions and actions */}
+                        {(block.type === "condition" || block.type === "action") && (
+                          <div className="mt-2 space-y-2">
+                            {block.type === "condition" && (
+                              <div className="grid grid-cols-2 gap-2">
+                                <div>
+                                  <Label className="text-xs">Value</Label>
+                                  <Input
+                                    placeholder="e.g. 150"
+                                    value={block.value || ""}
+                                    onChange={(e) => updateBlockValue(block.instanceId, 'value', e.target.value)}
+                                    className="h-7 text-xs"
+                                  />
+                                </div>
+                                <div>
+                                  <Label className="text-xs">Threshold</Label>
+                                  <Input
+                                    placeholder="e.g. ₹150"
+                                    value={block.threshold || ""}
+                                    onChange={(e) => updateBlockValue(block.instanceId, 'threshold', e.target.value)}
+                                    className="h-7 text-xs"
+                                  />
+                                </div>
+                              </div>
+                            )}
+                            {block.type === "action" && block.id === "stop-loss" && (
+                              <div>
+                                <Label className="text-xs">Stop Loss Value</Label>
+                                <Input
+                                  placeholder="e.g. ₹150"
+                                  value={block.threshold || ""}
+                                  onChange={(e) => updateBlockValue(block.instanceId, 'threshold', e.target.value)}
+                                  className="h-7 text-xs"
+                                />
+                              </div>
+                            )}
+                            {block.type === "action" && block.id === "take-profit" && (
+                              <div>
+                                <Label className="text-xs">Take Profit Value</Label>
+                                <Input
+                                  placeholder="e.g. ₹200"
+                                  value={block.threshold || ""}
+                                  onChange={(e) => updateBlockValue(block.instanceId, 'threshold', e.target.value)}
+                                  className="h-7 text-xs"
+                                />
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </div>
                       <Button
                         variant="ghost"

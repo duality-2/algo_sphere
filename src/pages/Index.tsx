@@ -23,7 +23,7 @@ const Index = () => {
       case "library":
         return <StrategyLibrary />;
       case "auth":
-        return <Auth />;
+        return <Auth onNavigate={setActiveView} />;
       case "execute":
         return <Dashboard />;
       default:
