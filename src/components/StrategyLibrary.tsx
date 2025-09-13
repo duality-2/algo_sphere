@@ -2,126 +2,165 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Eye, Copy, TrendingUp, Shield, Zap, Brain } from "lucide-react";
+import { Eye, Copy, PlusCircle } from "lucide-react";
 import { toast } from "sonner";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
+import { Textarea } from "./ui/textarea";
 
-const strategies = [
-  {
-    id: 1,
-    name: "Golden Cross Strategy",
-    description: "Buy when 50-day MA crosses above 200-day MA",
-    category: "Trend Following",
-    winRate: 65,
-    avgReturn: 12.5,
-    risk: "Medium",
-    icon: <TrendingUp className="h-5 w-5" />,
-    tags: ["Moving Average", "Long Term"],
-  },
-  {
-    id: 2,
-    name: "RSI Divergence",
-    description: "Trade based on RSI divergence patterns",
-    category: "Momentum",
-    winRate: 72,
-    avgReturn: 8.3,
-    risk: "Low",
-    icon: <Zap className="h-5 w-5" />,
-    tags: ["RSI", "Divergence"],
-  },
-  {
-    id: 3,
-    name: "Bollinger Band Squeeze",
-    description: "Trade breakouts from volatility contraction",
-    category: "Volatility",
-    winRate: 68,
-    avgReturn: 15.2,
-    risk: "High",
-    icon: <Shield className="h-5 w-5" />,
-    tags: ["Bollinger Bands", "Breakout"],
-  },
-  {
-    id: 4,
-    name: "MACD Crossover",
-    description: "Signal line crossover strategy",
-    category: "Trend Following",
-    winRate: 61,
-    avgReturn: 10.1,
-    risk: "Medium",
-    icon: <Brain className="h-5 w-5" />,
-    tags: ["MACD", "Crossover"],
-  },
-];
+// Define the type for a strategy based on our backend model
+interface Strategy {
+  id: number;
+  name: string;
+  description: string;
+  category: string;
+}
+
+// API function to fetch strategies
+const fetchStrategies = async (): Promise<Strategy[]> => {
+  const token = localStorage.getItem("token");
+  const response = await fetch("/api/strategies", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (!response.ok) {
+    throw new Error("Network response was not ok");
+  }
+  return response.json();
+};
+
+// API function to create a strategy
+const createStrategy = async (newStrategy: { name: string; description: string; category: string }): Promise<Strategy> => {
+  const token = localStorage.getItem("token");
+  const response = await fetch("/api/strategies", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(newStrategy),
+  });
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.detail || "Failed to create strategy");
+  }
+  return response.json();
+};
+
+
+function CreateStrategyForm({ onSuccess }: { onSuccess: () => void }) {
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [category, setCategory] = useState("");
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: createStrategy,
+    onSuccess: (data) => {
+      toast.success(`Strategy "${data.name}" created successfully!`);
+      queryClient.invalidateQueries({ queryKey: ['strategies'] });
+      onSuccess(); // Hide the form
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    }
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name || !description || !category) {
+        toast.warning("Please fill out all fields.");
+        return;
+    }
+    mutation.mutate({ name, description, category });
+  };
+
+  return (
+    <Card className="bg-card/70 border-border/50 mb-4">
+      <CardHeader>
+        <CardTitle>Create a New Strategy</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="name">Strategy Name</Label>
+            <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g., Mean Reversion" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="description">Description</Label>
+            <Textarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Describe the strategy's logic" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="category">Category</Label>
+            <Input id="category" value={category} onChange={(e) => setCategory(e.target.value)} placeholder="e.g., Momentum, Arbitrage" />
+          </div>
+          <div className="flex justify-end gap-2">
+             <Button variant="ghost" type="button" onClick={onSuccess}>Cancel</Button>
+             <Button type="submit" disabled={mutation.isPending}>
+                {mutation.isPending ? "Saving..." : "Save Strategy"}
+             </Button>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
+  );
+}
+
 
 export function StrategyLibrary() {
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  const { data: strategies, isLoading, isError, error } = useQuery<Strategy[], Error>({ 
+      queryKey: ['strategies'], 
+      queryFn: fetchStrategies 
+  });
+
   const handleUseStrategy = (strategyName: string) => {
     toast.success(`Loading ${strategyName} into builder`);
   };
 
-  const handleViewDetails = (strategyName: string) => {
-    toast.info(`Opening details for ${strategyName}`);
-  };
+  const handleViewDetails = (strategyName:string) => {
+      toast.info(`Opening details for ${strategyName}`);
+  }
 
-  const getRiskColor = (risk: string) => {
-    switch (risk) {
-      case "Low":
-        return "bg-profit/20 text-profit";
-      case "Medium":
-        return "bg-chart-4/20 text-chart-4";
-      case "High":
-        return "bg-loss/20 text-loss";
-      default:
-        return "bg-secondary text-secondary-foreground";
-    }
-  };
+  if (isLoading) {
+      return <div>Loading strategies...</div>;
+  }
+
+  if (isError) {
+      return <div>Error: {error.message}</div>;
+  }
 
   return (
     <Card className="bg-gradient-card border-border/50">
-      <CardHeader>
-        <CardTitle>Strategy Library</CardTitle>
-        <CardDescription>Pre-built strategies ready to backtest</CardDescription>
+      <CardHeader className="flex flex-row items-center justify-between">
+        <div>
+            <CardTitle>Strategy Library</CardTitle>
+            <CardDescription>Your saved strategies</CardDescription>
+        </div>
+        <Button onClick={() => setShowCreateForm(!showCreateForm)}>
+            <PlusCircle className="h-4 w-4 mr-2" />
+            Create Strategy
+        </Button>
       </CardHeader>
       <CardContent>
+        {showCreateForm && <CreateStrategyForm onSuccess={() => setShowCreateForm(false)} />}
         <ScrollArea className="h-[500px] pr-4">
           <div className="space-y-4">
-            {strategies.map((strategy) => (
+            {strategies && strategies.map((strategy) => (
               <Card key={strategy.id} className="bg-card/50 border-border/50 hover:shadow-md transition-all">
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-secondary">
-                        {strategy.icon}
-                      </div>
                       <div>
                         <h3 className="font-medium">{strategy.name}</h3>
                         <p className="text-sm text-muted-foreground">{strategy.description}</p>
                       </div>
                     </div>
-                    <Badge className={getRiskColor(strategy.risk)}>{strategy.risk} Risk</Badge>
+                    <Badge variant="outline">{strategy.category}</Badge>
                   </div>
-
-                  <div className="grid grid-cols-3 gap-2 mb-3 text-sm">
-                    <div>
-                      <span className="text-muted-foreground">Win Rate</span>
-                      <p className="font-medium text-profit">{strategy.winRate}%</p>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">Avg Return</span>
-                      <p className="font-medium text-profit">+{strategy.avgReturn}%</p>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">Category</span>
-                      <p className="font-medium">{strategy.category}</p>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-wrap gap-2 mb-3">
-                    {strategy.tags.map((tag) => (
-                      <Badge key={tag} variant="outline" className="text-xs">
-                        {tag}
-                      </Badge>
-                    ))}
-                  </div>
-
                   <div className="flex gap-2">
                     <Button
                       variant="glass"
@@ -145,6 +184,12 @@ export function StrategyLibrary() {
                 </CardContent>
               </Card>
             ))}
+             {strategies && strategies.length === 0 && !showCreateForm && (
+                <div className="text-center py-10">
+                    <p className="text-muted-foreground">You haven't created any strategies yet.</p>
+                    <Button variant="link" onClick={() => setShowCreateForm(true)}>Create your first one</Button>
+                </div>
+             )}
           </div>
         </ScrollArea>
       </CardContent>

@@ -100,6 +100,11 @@ def run_simulation(strategy_json: dict, ticker: str, start_date: str, end_date: 
     # 1. Fetch and prepare data
     data = yf.download(ticker, start=start_date, end=end_date, progress=False)
     if data.empty: raise ValueError("No data fetched.")
+    
+    # Ensure OHLC data is present
+    ohlc_columns = ['Open', 'High', 'Low', 'Close']
+    if not all(col in data.columns for col in ohlc_columns):
+        raise ValueError("OHLC data not found in yfinance download.")
 
     # 2. Get signals from the base technical strategy
     if strategy_type == "TrendFollowing":
@@ -157,6 +162,9 @@ def run_simulation(strategy_json: dict, ticker: str, start_date: str, end_date: 
     # 5. Calculate Performance & Format Output
     metrics = calculate_performance_metrics(equity_df['portfolio_value'])
     
+    # Prepare candlestick data
+    candlestick_data = data[ohlc_columns].reset_index().to_dict(orient='records')
+
     results = {
         "keyMetrics": [
             {"label": "Final Portfolio Value", "value": f"₹{equity_df['portfolio_value'].iloc[-1]:,.2f}"},
@@ -166,6 +174,7 @@ def run_simulation(strategy_json: dict, ticker: str, start_date: str, end_date: 
             {"label": "Max Drawdown", "value": f"{metrics['max_drawdown_pct']}%", "positive": metrics['max_drawdown_pct'] > -15},
         ],
         "performanceData": equity_df.reset_index().to_dict(orient='records'),
+        "candlestickData": candlestick_data
     }
     print("Simulation finished.")
     return results

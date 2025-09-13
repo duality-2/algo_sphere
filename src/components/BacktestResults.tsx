@@ -14,6 +14,7 @@ import {
   Tooltip,
   ResponsiveContainer,
   Legend,
+  ComposedChart,
 } from "recharts";
 import { TrendingUp, TrendingDown, DollarSign, Percent, Calendar, Target } from "lucide-react";
 
@@ -44,6 +45,26 @@ const metrics = [
   { label: "Total Trades", value: "50", icon: Calendar, positive: true },
 ];
 
+// Candlestick component using Bar for wick and body
+const Candlestick = (props: any) => {
+  const { x, y, width, height, low, high, open, close } = props;
+  const isBullish = close > open;
+  const color = isBullish ? "hsl(var(--profit))" : "hsl(var(--loss))";
+
+  return (
+    <g>
+      <line x1={x + width / 2} y1={y} x2={x + width / 2} y2={y + height} stroke={color} />
+      <rect
+        x={x}
+        y={isBullish ? y + (open - close) : y}
+        width={width}
+        height={Math.abs(open - close)}
+        fill={color}
+      />
+    </g>
+  );
+};
+
 export function BacktestResults() {
   return (
     <div className="space-y-6">
@@ -70,6 +91,7 @@ export function BacktestResults() {
           <TabsTrigger value="performance">Performance</TabsTrigger>
           <TabsTrigger value="distribution">Trade Distribution</TabsTrigger>
           <TabsTrigger value="drawdown">Drawdown</TabsTrigger>
+          <TabsTrigger value="candlestick">Candlestick</TabsTrigger>
         </TabsList>
 
         <TabsContent value="performance">
@@ -175,6 +197,35 @@ export function BacktestResults() {
             </CardContent>
           </Card>
         </TabsContent>
+        
+        <TabsContent value="candlestick">
+          <Card className="bg-gradient-card border-border/50">
+            <CardHeader>
+              <CardTitle>Candlestick Chart</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={400}>
+                <ComposedChart data={[] /* Replace with backtestResults.candlestickData */}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                  <XAxis dataKey="Date" stroke="hsl(var(--muted-foreground))" />
+                  <YAxis
+                    domain={['auto', 'auto']}
+                    stroke="hsl(var(--muted-foreground))"
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "hsl(var(--card))",
+                      border: "1px solid hsl(var(--border))",
+                      borderRadius: "6px",
+                    }}
+                  />
+                  <Bar dataKey="ohlc" shape={<Candlestick />} />
+                </ComposedChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
       </Tabs>
     </div>
   );
