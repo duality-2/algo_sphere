@@ -69,7 +69,7 @@ export function BacktestResults() {
   return (
     <div className="space-y-6">
       {/* Key Metrics */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
         {metrics.map((metric) => (
           <Card key={metric.label} className="bg-gradient-card border-border/50">
             <CardContent className="p-4">
