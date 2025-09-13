@@ -52,7 +52,11 @@ interface DroppedBlock {
   instanceId: string;
 }
 
-export function StrategyBuilder() {
+interface StrategyBuilderProps {
+  onNavigate?: (view: string) => void;
+}
+
+export function StrategyBuilder({ onNavigate }: StrategyBuilderProps) {
   const [droppedBlocks, setDroppedBlocks] = useState<DroppedBlock[]>([]);
   const [draggedOver, setDraggedOver] = useState(false);
 
@@ -260,13 +264,13 @@ export function StrategyBuilder() {
           </div>
 
           <div className="mt-4 flex gap-2">
-            <Button variant="profit" className="flex-1">
+            <Button variant="profit" className="flex-1" onClick={() => onNavigate?.("backtesting")}>
               <PlayCircle className="h-4 w-4 mr-2" />
               Run Backtest
             </Button>
-            <Button variant="glass">
-              <RefreshCw className="h-4 w-4 mr-2" />
-              Optimize
+            <Button variant="glass" onClick={() => { onNavigate?.("execute"); toast.info("Execute flow not yet implemented"); }}>
+              <Zap className="h-4 w-4 mr-2" />
+              Live Execute
             </Button>
           </div>
         </CardContent>

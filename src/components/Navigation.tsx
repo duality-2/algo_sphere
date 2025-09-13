@@ -11,6 +11,7 @@ export function Navigation({ activeView, onViewChange }: NavigationProps) {
   const navItems = [
     { id: "dashboard", label: "Dashboard", icon: Activity },
     { id: "builder", label: "Strategy Builder", icon: BarChart3 },
+    { id: "backtesting", label: "Backtesting", icon: BookOpen },
     { id: "backtest", label: "Backtest Results", icon: BookOpen },
     { id: "library", label: "Strategy Library", icon: Settings },
   ];
@@ -48,7 +49,7 @@ export function Navigation({ activeView, onViewChange }: NavigationProps) {
       </div>
 
       <div className="flex items-center gap-2">
-        <Button variant="ghost" size="icon">
+        <Button variant="ghost" size="icon" onClick={() => onViewChange("auth")}>
           <User className="h-5 w-5" />
         </Button>
         <Button variant="ghost" size="icon">
